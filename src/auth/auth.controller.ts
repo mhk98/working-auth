@@ -9,16 +9,18 @@ import {
 import { UserDto } from 'src/users/user.dto';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './jwt-auth.guard';
-import { LocalAuthGuard } from './local-auth.guard';
 
 @Controller()
 export class AuthController {
   constructor(private authService: AuthService) {}
 
-  @UseGuards(LocalAuthGuard)
-  @Post('auth/login')
+  // @UseGuards(LocalAuthGuard)
+  @Post('signin')
   async login(@Request() req) {
-    return this.authService.login(req.user);
+    console.log('auth signin');
+    // console.log(req);
+
+    return this.authService.login(req.body);
   }
 
   @UseGuards(JwtAuthGuard)

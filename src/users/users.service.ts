@@ -1,8 +1,10 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from './user.entity';
+// import { User } from './user.entity';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
+import { Users } from './usertbl.entity';
+// import { usertbl } from './usertbl.entity';
 
 // This should be a real class/interface representing a user entity
 // export type User = any;
@@ -26,35 +28,36 @@ export class UsersService {
   //   return this.users.find((user) => user.username === username);
 
   constructor(
-    @InjectRepository(User)
-    private usersRepository: Repository<User>,
-  ) { }
+    @InjectRepository(Users)
+    private usersRepository: Repository<Users>,
+  ) {}
 
-  findAll(): Promise<User[]> {
+  findAll(): Promise<Users[]> {
     return this.usersRepository.find();
   }
 
-  findOne(username: string): Promise<User> {
-    return this.usersRepository.findOneBy({ username:username });
-  }
-
-  async remove(id: string): Promise<void> {
-    await this.usersRepository.delete(id);
+  findOne(User_Email: string): Promise<Users> {
+    return this.usersRepository.findOneBy({ User_Email: User_Email });
   }
 
   async SignUP(body: any) {
-    let existence = this.usersRepository.findOneBy({ username: body.username });
-    console.log(existence, 'existence')
-    if(existence){
-      throw new HttpException({
-        status: HttpStatus.FORBIDDEN,
-        error: 'You already registered',
-      }, HttpStatus.FORBIDDEN);
+    let existence = await this.usersRepository.findOneBy({
+      User_Email: body.User_Email,
+    });
+    console.log(existence);
+    if (existence) {
+      throw new UnauthorizedException('Credentials incorrect');
+    } else {
+      console.log('Congratulations for signup');
     }
     const saltOrRounds = 10;
-    const hash = await bcrypt.hash(body.password, saltOrRounds);
+    const hash = await bcrypt.hash(body.pass_word, saltOrRounds);
     console.log(body, 'sign up data here');
-    let UserEntity = await this.usersRepository.create({ username: body.username, password: hash });
+    let UserEntity = await this.usersRepository.create({
+      // User_FirstName:
+      User_Email: body.User_Email,
+      pass_word: hash,
+    });
     return this.usersRepository.save(UserEntity);
   }
 }
