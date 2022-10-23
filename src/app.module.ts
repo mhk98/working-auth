@@ -4,7 +4,7 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Users } from './users/usertbl.entity';
+import { usertbl } from './users/usertbl.entity';
 
 @Module({
   imports: [
@@ -15,8 +15,9 @@ import { Users } from './users/usertbl.entity';
       username: 'kabir',
       password: 'KHAtarnak@@26',
       database: 'toll',
-      entities: [Users],
+      entities: [usertbl],
       synchronize: true,
+      // dropSchema: true,
     }),
     AuthModule,
     UsersModule,

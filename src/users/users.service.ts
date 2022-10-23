@@ -1,10 +1,8 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-// import { User } from './user.entity';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
-import { Users } from './usertbl.entity';
-// import { usertbl } from './usertbl.entity';
+import { usertbl } from './usertbl.entity';
 
 // This should be a real class/interface representing a user entity
 // export type User = any;
@@ -28,21 +26,21 @@ export class UsersService {
   //   return this.users.find((user) => user.username === username);
 
   constructor(
-    @InjectRepository(Users)
-    private usersRepository: Repository<Users>,
+    @InjectRepository(usertbl)
+    private usersRepository: Repository<usertbl>,
   ) {}
 
-  findAll(): Promise<Users[]> {
+  findAll(): Promise<usertbl[]> {
     return this.usersRepository.find();
   }
 
-  findOne(User_Email: string): Promise<Users> {
-    return this.usersRepository.findOneBy({ User_Email: User_Email });
+  findOne(Mobile_No: string): Promise<usertbl> {
+    return this.usersRepository.findOneBy({ Mobile_No: Mobile_No });
   }
 
   async SignUP(body: any) {
     let existence = await this.usersRepository.findOneBy({
-      User_Email: body.User_Email,
+      Mobile_No: body.Mobile_No,
     });
     console.log(existence);
     if (existence) {
@@ -54,10 +52,14 @@ export class UsersService {
     const hash = await bcrypt.hash(body.pass_word, saltOrRounds);
     console.log(body, 'sign up data here');
     let UserEntity = await this.usersRepository.create({
-      // User_FirstName:
+      User_FirstName: body.User_FirstName,
+      User_LastName: body.User_LastName,
       User_Email: body.User_Email,
       pass_word: hash,
+      Mobile_No: body.Mobile_No,
+      User_role: body.User_role,
     });
+    console.log(body);
     return this.usersRepository.save(UserEntity);
   }
 }
